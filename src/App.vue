@@ -1,14 +1,16 @@
 <template>
   <div class="app-wrapper">
     <div class="app">
-      <Navigation />
+      <Navigation  v-if="!navigation"/>
       <router-view />
-      <Footer />
+      <Footer v-if="!navigation"/>
     </div>
   </div>
 </template>
 
 <script>
+import firebase from "firebase/app";
+import "firebase/auth";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
@@ -16,12 +18,38 @@ export default {
   name: "app",
   components: { Navigation, Footer },
   data() {
-    return {};
+    return {
+      navigation: null
+    };
   },
-  created() {},
+  created() {
+    this.checkRoute();
+    firebase.auth().onAuthStateChanged(user => {
+      this.$store.commit('updateUser', user);
+      if(user){
+        this.$store.dispatch('getCurrentUser');
+      }
+    })
+   // console.log(firebase.auth().currentUser.uid);
+  },
   mounted() {},
-  methods: {},
-  watch: {},
+  methods: {
+    checkRoute(){
+      if( this.$route.name === "Login" ||
+          this.$route.name === "Register" ||
+          this.$route.name === "ForgotPassword"
+      ) {
+         this.navigation = true
+        return;
+      }
+      this.navigation = false
+    }
+  },
+  watch: {
+    $route() {
+      this.checkRoute();
+    }
+  },
 };
 </script>
 

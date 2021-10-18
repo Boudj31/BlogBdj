@@ -1,6 +1,6 @@
 <template>
    <div class="home">
-     <BlogPost :post="welcomeScreen"/>
+     <BlogPost :post="welcomeScreen" v-if="!user"/>
      <BlogPost :post="post" v-for="(post, i) in sampleBlogPosts" :key="i" />
      <div class="blog-card-wrap">
        <div class="container">
@@ -10,7 +10,7 @@
          </div>
        </div>
      </div>
-     <div class="updates">
+     <div class="updates" v-if="!user">
        <div class="container">
          <h2>Ne manquer plus aucun articles. Inscrivez-vous gratuitement</h2>
          <router-link class="router-button" to="#">
@@ -51,12 +51,14 @@ export default {
           blogCoverPhoto: "designed-for-everyone"
         },
       ],
-      sampleBlogCard: [
-        {blogTitle: "Blog Card 1", blogCoverPhoto: "stock-1", blogDate: "May 1, 2021"},
-        {blogTitle: "Blog Card 2", blogCoverPhoto: "stock-2", blogDate: "May 1, 2021"},
-        {blogTitle: "Blog Card 3", blogCoverPhoto: "stock-3", blogDate: "May 1, 2021"},
-        {blogTitle: "Blog Card 4", blogCoverPhoto: "stock-4", blogDate: "May 1, 2021"}
-      ]
+    }
+  },
+  computed: {
+    sampleBlogCard() {
+      return this.$store.state.sampleBlogCard;
+    },
+    user() {
+      return this.$store.state.user;
     }
   }
 
