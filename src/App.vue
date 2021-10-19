@@ -1,6 +1,6 @@
 <template>
   <div class="app-wrapper">
-    <div class="app">
+    <div class="app" v-if="this.$store.state.postLoaded">
       <Navigation  v-if="!navigation"/>
       <router-view />
       <Footer v-if="!navigation"/>
@@ -27,9 +27,11 @@ export default {
     firebase.auth().onAuthStateChanged(user => {
       this.$store.commit('updateUser', user);
       if(user){
-        this.$store.dispatch('getCurrentUser');
+
+        this.$store.dispatch('getCurrentUser', user);
       }
     })
+    this.$store.dispatch('getPost')
    // console.log(firebase.auth().currentUser.uid);
   },
   mounted() {},

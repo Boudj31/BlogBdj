@@ -8,6 +8,11 @@ import Register from "@/views/Register";
 import About from "@/views/About";
 import Profile from "@/views/Profile";
 import Admin from "@/views/Admin";
+import CreatePost from "@/views/CreatePost";
+import BlogPreview from "@/views/BlogPreview";
+import ViewBlog from "@/views/ViewBlog";
+import EditBlog from "@/views/EditBlog";
+import firebase from "firebase";
 
 Vue.use(VueRouter);
 
@@ -17,7 +22,8 @@ const routes = [
         name: "Home",
         component: Home,
         meta: {
-            title: "Home"
+            title: "Home",
+            requiresAuth: false,
         }
     },
     {
@@ -25,7 +31,8 @@ const routes = [
         name: "Blogs",
         component: Blogs,
         meta: {
-            title: "Blogs"
+            title: "Blogs",
+            requiresAuth: false,
         }
     },
     {
@@ -33,7 +40,8 @@ const routes = [
         name: "About",
         component: About,
         meta: {
-            title: "A propos"
+            title: "A propos",
+            requiresAuth: false,
         }
     },
     {
@@ -41,7 +49,8 @@ const routes = [
         name: "Login",
         component: Login,
         meta: {
-            title: "Login"
+            title: "Login",
+            requiresAuth: false,
         }
     },
     {
@@ -49,7 +58,8 @@ const routes = [
         name: "Register",
         component: Register,
         meta: {
-            title: "Register"
+            title: "Register",
+            requiresAuth: false,
         }
     },
     {
@@ -57,7 +67,8 @@ const routes = [
         name: "ForgotPassword",
         component: ForgotPassword,
         meta: {
-            title: "ForgotPassword"
+            title: "ForgotPassword",
+            requiresAuth: false,
         }
     },
     {
@@ -65,7 +76,8 @@ const routes = [
         name: "Profile",
         component: Profile,
         meta: {
-            title: "Profil"
+            title: "Profil",
+            requiresAuth: true,
         }
     },
     {
@@ -73,7 +85,48 @@ const routes = [
         name: "Admin",
         component: Admin,
         meta: {
-            title: "Admin"
+            title: "Admin",
+            requiresAuth: true,
+            requiresAdmin: true,
+        }
+    },
+    {
+        path: "/nouveau",
+        name: "Nouveau",
+        component: CreatePost,
+        meta: {
+            title: "Nouveau",
+            requiresAuth: true,
+            requiresAdmin: false,
+        }
+    },
+    {
+        path: "/post-preview",
+        name: "BlogPreview",
+        component: BlogPreview,
+        meta: {
+            title: "Aperçu",
+            requiresAuth: true,
+            requiresAdmin: false,
+        }
+    },
+    {
+        path: "/view-blog/:blogid",
+        name: "ViewBlog",
+        component: ViewBlog,
+        meta: {
+            title: "Article ",
+            requiresAuth: false
+        }
+    },
+    {
+        path: "/edit-blog/:blogid",
+        name: "EditBlog",
+        component: EditBlog,
+        meta: {
+            title: "Modifier Article ",
+            requiresAuth: true,
+            requiresAdmin: false,
         }
     },
 ];
@@ -89,5 +142,27 @@ router.beforeEach((to, from, next) => {
     document.title = `${to.meta.title} | BlogBdj`;
     next();
 })
+
+router.beforeEach(async (to, from, next) => {
+    let user = firebase.auth().currentUser;
+    let admin = null;
+    if (user) {
+        let token = await user.getIdTokenResult();
+        admin = token.claims.admin;
+    }
+    if (to.matched.some((res) => res.meta.requiresAuth)) {
+        if (user) {
+            if (to.matched.some((res) => res.meta.requiresAdmin)) {
+                if (admin) {
+                    return next();
+                }
+                return next({ name: "Home" });
+            }
+            return next();
+        }
+        return next({ name: "Home" });
+    }
+    return next();
+});
 
 export default router;

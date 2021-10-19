@@ -24,7 +24,7 @@
             <router-link class="link" :to="{ name: 'Home' }">Accueil</router-link>
             <router-link class="link" :to="{ name: 'Blogs' }">Articles</router-link>
             <router-link  class="link" :to="{ name: 'About' }">A propos</router-link>
-            <router-link v-if="admin" class="link" :to="{ name: 'CreatePost' }">Nouveau</router-link>
+            <router-link v-if="admin" class="link" :to="{ name: 'Nouveau' }">Nouveau</router-link>
             <router-link v-if="!user" class="link" :to="{ name: 'Login' }">Connexion / Inscription</router-link>
           </ul>
         </div>
